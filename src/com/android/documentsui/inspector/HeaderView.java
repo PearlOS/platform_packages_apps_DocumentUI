@@ -22,6 +22,7 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.text.Selection;
 import android.text.Spannable;
+import android.text.Layout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,10 +78,10 @@ public final class HeaderView extends RelativeLayout implements HeaderDisplay {
 
     @Override
     public void accept(DocumentInfo info, String displayName) {
-        loadHeaderImage(info);
         mTitle.setText(displayName);
         mTitle.setCustomSelectionActionModeCallback(
                 new HeaderTextSelector(mTitle, this::selectText));
+        loadHeaderImage(info);
     }
 
     private void selectText(Spannable text, int start, int stop) {
@@ -114,7 +115,8 @@ public final class HeaderView extends RelativeLayout implements HeaderDisplay {
             mThumbnail.setScaleType(ScaleType.CENTER_CROP);
             mThumbnail.setImageBitmap(thumbnail);
         } else {
-            mThumbnail.setPadding(0, 0, 0, mTitle.getHeight());
+            Layout layout = mTitle.getLayout();
+            mThumbnail.setPadding(0, 0, 0, layout.getLineTop(mTitle.getLineCount()));
 
             Drawable mimeIcon =
                     mContext.getContentResolver().getTypeDrawable(info.mimeType);

@@ -31,6 +31,7 @@ import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.DocumentsContract;
@@ -103,7 +104,7 @@ public abstract class AbstractActionHandler<T extends Activity & CommonAddons>
     private Runnable mDisplayStateChangedListener;
 
     private ContentLock mContentLock;
-
+    private GetRootDocumentTask mGetRootDocumentTask = null;
     @Override
     public void registerDisplayStateChangedListener(Runnable l) {
         mDisplayStateChangedListener = l;
@@ -181,14 +182,18 @@ public abstract class AbstractActionHandler<T extends Activity & CommonAddons>
 
     @Override
     public void getRootDocument(RootInfo root, int timeout, Consumer<DocumentInfo> callback) {
-        GetRootDocumentTask task = new GetRootDocumentTask(
+        if((mGetRootDocumentTask != null) && (mGetRootDocumentTask.getStatus() != AsyncTask.Status.FINISHED)) {
+            Log.d(TAG, "before mGetRootDocumentTask not finish, status " + mGetRootDocumentTask.getStatus());
+            mGetRootDocumentTask.cancel(true);
+        }
+        mGetRootDocumentTask = new GetRootDocumentTask(
                 root,
                 mActivity,
                 timeout,
                 mDocs,
                 callback);
 
-        task.executeOnExecutor(mExecutors.lookup(root.authority));
+        mGetRootDocumentTask.executeOnExecutor(mExecutors.lookup(root.authority));
     }
 
     @Override

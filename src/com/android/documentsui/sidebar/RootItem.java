@@ -28,7 +28,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import android.util.Log;
+import android.os.Environment;
+import java.io.File;
 import com.android.documentsui.ActionHandler;
 import com.android.documentsui.MenuManager;
 import com.android.documentsui.R;
@@ -87,8 +89,19 @@ class RootItem extends Item {
         // Show available space if no summary
         String summaryText = root.summary;
         if (TextUtils.isEmpty(summaryText) && root.availableBytes >= 0) {
+            Long availableBytes = root.availableBytes;
+            if(root.rootId.equals("primary")){
+                availableBytes = Environment.getExternalStorageDirectory().getUsableSpace();
+            } else {
+                File f = new File(Environment.getStorageDirectory().getAbsolutePath() +"/" + root.rootId);
+                if(f.isDirectory()){
+                    availableBytes = f.getUsableSpace();
+                }else {
+                    Log.d("RootItem", "invalid root");
+                }
+            }
             summaryText = context.getString(R.string.root_available_bytes,
-                    Formatter.formatFileSize(context, root.availableBytes));
+                    Formatter.formatFileSize(context, availableBytes));
         }
 
         summary.setText(summaryText);

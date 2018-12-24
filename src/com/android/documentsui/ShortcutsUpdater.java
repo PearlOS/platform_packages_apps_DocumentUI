@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
 import android.graphics.drawable.Icon;
+import android.util.Log;
 
 import com.android.documentsui.R;
 import com.android.documentsui.base.Providers;
@@ -56,8 +57,11 @@ public final class ShortcutsUpdater {
         for (ShortcutInfo s : devices) {
             deviceIds.add(s.getId());
         }
-
-        mgr.setDynamicShortcuts(devices.subList(0, getNumDynSlots(mgr, devices.size())));
+        try {
+            mgr.setDynamicShortcuts(devices.subList(0, getNumDynSlots(mgr, devices.size())));
+        } catch (IllegalStateException e) {
+            Log.e( "ShortcutsUpdater", "setDynamicShortcuts failed " + e);
+        }
 
         // Mark any shortcut that doesn't correspond to a current root as disabled.
         List<String> disabled = new ArrayList<>();

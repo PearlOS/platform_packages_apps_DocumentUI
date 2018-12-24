@@ -18,6 +18,7 @@ package com.android.documentsui.services;
 
 import static com.android.documentsui.base.SharedMinimal.DEBUG;
 import static com.android.documentsui.services.FileOperationService.OPERATION_DELETE;
+import static com.android.documentsui.services.FileOperationService.MESSAGE_FINISH;
 
 import android.app.Notification;
 import android.app.Notification.Builder;
@@ -25,6 +26,11 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.RemoteException;
 
 import com.android.documentsui.Metrics;
 import com.android.documentsui.R;
@@ -44,6 +50,9 @@ final class DeleteJob extends ResolvedResourcesJob {
     private final Uri mParentUri;
 
     private volatile int mDocsProcessed = 0;
+
+    private final Messenger mMessenger;
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
     /**
      * Moves files to a destination identified by {@code destination}.
      * Performs most work by delegating to CopyJob, then deleting
@@ -52,9 +61,10 @@ final class DeleteJob extends ResolvedResourcesJob {
      * @see @link {@link Job} constructor for most param descriptions.
      */
     DeleteJob(Context service, Listener listener, String id, DocumentStack stack,
-            UrisSupplier srcs, @Nullable Uri srcParent, Features features) {
+            UrisSupplier srcs, @Nullable Uri srcParent, Features features, Messenger messenger) {
         super(service, listener, id, OPERATION_DELETE, stack, srcs, features);
         mParentUri = srcParent;
+        mMessenger = messenger;
     }
 
     @Override
@@ -92,6 +102,16 @@ final class DeleteJob extends ResolvedResourcesJob {
     @Override
     Notification getWarningNotification() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    void finish() {
+        try {
+            mMessenger.send(Message.obtain(mHandler, MESSAGE_FINISH, 0, 0));
+        } catch (RemoteException e) {
+            // Ignore. Most likely the frontend was killed.
+        }
+        super.finish();
     }
 
     @Override

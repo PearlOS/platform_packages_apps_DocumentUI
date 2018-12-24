@@ -26,6 +26,8 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.DocumentsContract;
 import android.text.TextUtils;
 import android.util.Log;
@@ -70,6 +72,7 @@ import com.android.documentsui.services.FileOperationService;
 import com.android.documentsui.services.FileOperations;
 import com.android.documentsui.ui.DialogController;
 import com.android.internal.annotations.VisibleForTesting;
+import com.android.documentsui.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -148,6 +151,7 @@ public class ActionHandler<T extends Activity & Addons> extends AbstractActionHa
         Metrics.logUserAction(mActivity, Metrics.USER_ACTION_SETTINGS);
         final Intent intent = new Intent(DocumentsContract.ACTION_DOCUMENT_ROOT_SETTINGS);
         intent.setDataAndType(root.getUri(), DocumentsContract.Root.MIME_TYPE_ITEM);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mActivity.startActivity(intent);
     }
 
@@ -333,7 +337,20 @@ public class ActionHandler<T extends Activity & Addons> extends AbstractActionHa
                     .withSrcs(srcs)
                     .withSrcParent(srcParent == null ? null : srcParent.derivedUri)
                     .build();
-
+            operation.addMessageListener(new Handler.Callback() {
+                @Override
+                public boolean handleMessage(Message message) {
+                    switch (message.what) {
+                        case FileOperationService.MESSAGE_FINISH:
+                        if(((BaseActivity)mActivity).isSearchExpanded()) {
+                            Log.d(TAG, "In the Searching mode should update serch result");
+                            ((BaseActivity)mActivity).reSerch();
+                       }
+                        return true;
+                    }
+                    return false;
+                }
+            });
             FileOperations.start(mActivity, operation, mDialogs::showFileOperationStatus,
                     FileOperations.createJobId());
         };

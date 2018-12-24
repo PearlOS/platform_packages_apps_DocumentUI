@@ -164,6 +164,13 @@ public class SearchViewManager implements
         showMenu(stack);
     }
 
+    public void reSerch() {
+        if (isSearching()) {
+            mSearchView.setQuery(mCurrentSearch, true);
+        }
+    }
+
+
     public void showMenu(@Nullable DocumentStack stack) {
         final DocumentInfo cwd = stack != null ? stack.peek() : null;
 
@@ -190,6 +197,13 @@ public class SearchViewManager implements
         }
 
         mMenuItem.setVisible(supportsSearch);
+    }
+
+    public void openSearch() {
+        if(mMenuItem.isVisible()){
+            mMenuItem.expandActionView();
+            mSearchView.setIconified(false);
+        }
     }
 
     /**

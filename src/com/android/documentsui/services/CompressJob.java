@@ -18,6 +18,7 @@ package com.android.documentsui.services;
 
 import static com.android.documentsui.base.SharedMinimal.DEBUG;
 import static com.android.documentsui.services.FileOperationService.OPERATION_MOVE;
+import static com.android.documentsui.services.FileOperationService.OPERATION_COMPRESS;
 
 import android.app.Notification;
 import android.app.Notification.Builder;
@@ -58,7 +59,7 @@ final class CompressJob extends CopyJob {
      */
     CompressJob(Context service, Listener listener, String id, DocumentStack destination,
             UrisSupplier srcs, Messenger messenger, Features features) {
-        super(service, listener, id, OPERATION_MOVE, destination, srcs, messenger, features);
+        super(service, listener, id, OPERATION_COMPRESS, destination, srcs, messenger, features);
     }
 
     @Override

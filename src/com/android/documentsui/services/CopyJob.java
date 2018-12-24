@@ -140,11 +140,14 @@ class CopyJob extends ResolvedResourcesJob {
     Notification getProgressNotification(@StringRes int msgId) {
         updateRemainingTimeEstimate();
 
-        if (mBytesRequired >= 0) {
+        if (mBytesRequired >= 0  && (this.mBytesCopied < mBytesRequired )) {
             double completed = (double) this.mBytesCopied / mBytesRequired;
             mProgressBuilder.setProgress(100, (int) (completed * 100), false);
             mProgressBuilder.setSubText(
                     NumberFormat.getPercentInstance().format(completed));
+        } else if(this.mBytesCopied > mBytesRequired){
+            mProgressBuilder.setProgress(0, 0, true);
+            Log.d(TAG, "Copy progress execption, mBytesCopied:" + this.mBytesCopied + ", mBytesRequired:" + mBytesRequired);
         } else {
             // If the total file size failed to compute on some files, then show
             // an indeterminate spinner. CopyJob would most likely fail on those

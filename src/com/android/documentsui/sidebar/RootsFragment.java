@@ -233,7 +233,10 @@ public class RootsFragment extends Fragment {
                 mAdapter = new RootsAdapter(activity, sortedItems, mDragListener);
                 mList.setAdapter(mAdapter);
 
-                mInjector.shortcutsUpdater.accept(roots);
+                if(mInjector.features.isLauncherEnabled()) {
+                    mInjector.shortcutsUpdater.accept(roots);
+                }
+
                 onCurrentRootChanged();
             }
 

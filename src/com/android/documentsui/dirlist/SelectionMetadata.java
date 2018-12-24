@@ -114,6 +114,7 @@ public class SelectionMetadata extends SelectionObserver
         mWritableDirectoryCount = 0;
         mNoDeleteCount = 0;
         mNoRenameCount = 0;
+        mInArchiveCount = 0;
     }
 
     @Override

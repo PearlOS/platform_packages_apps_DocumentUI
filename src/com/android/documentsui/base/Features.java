@@ -47,6 +47,7 @@ public interface Features {
     boolean isRemoteActionsEnabled();
     boolean isSystemKeyboardNavigationEnabled();
     boolean isVirtualFilesSharingEnabled();
+    boolean isLauncherEnabled();
 
 
     /**
@@ -168,5 +169,10 @@ public interface Features {
         public boolean isVirtualFilesSharingEnabled() {
             return isEnabled(R.bool.feature_virtual_files_sharing);
         }
+        @Override
+        public boolean isLauncherEnabled() {
+            return isEnabled(R.bool.is_launcher_enabled);
+        }
+
     }
 }
